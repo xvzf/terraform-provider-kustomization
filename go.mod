@@ -14,4 +14,7 @@ require (
 	sigs.k8s.io/kustomize/kyaml v0.12.0
 )
 
-require golang.org/x/sys v0.0.0-20210927094055-39ccf1dd6fa6 // indirect
+require (
+	github.com/evanphx/json-patch v4.11.0+incompatible
+	golang.org/x/sys v0.0.0-20210927094055-39ccf1dd6fa6 // indirect
+)

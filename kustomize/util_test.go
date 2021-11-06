@@ -7,26 +7,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-func TestLastAppliedConfig(t *testing.T) {
-	srcJSON := "{\"apiVersion\": \"v1\", \"kind\": \"Namespace\", \"metadata\": {\"name\": \"test-unit\"}}"
-	u, err := parseJSON(srcJSON)
-	if err != nil {
-		t.Errorf("Error: %s", err)
-	}
-	setLastAppliedConfig(u, srcJSON)
-
-	annotations := u.GetAnnotations()
-	count := len(annotations)
-	if count != 1 {
-		t.Errorf("TestLastAppliedConfig: incorrect number of annotations, got: %d, want: %d.", count, 1)
-	}
-
-	lac := getLastAppliedConfig(u)
-	if lac != srcJSON {
-		t.Errorf("TestLastAppliedConfig: incorrect annotation value, got: %s, want: %s.", srcJSON, lac)
-	}
-}
-
 func TestGetPatchStrategicMergePatch1(t *testing.T) {
 	o, _ := parseJSON(testGetPatchStrategicMergePatch1OriginalJSON)
 	m, _ := parseJSON(testGetPatchStrategicMergePatch1ModifiedJSON)

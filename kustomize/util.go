@@ -4,9 +4,7 @@ import (
 	"context"
 	"fmt"
 	"runtime"
-	"strings"
 
-	k8scorev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	k8smetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sunstructured "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -20,21 +18,6 @@ import (
 	"k8s.io/kubectl/pkg/scheme"
 )
 
-const lastAppliedConfig = k8scorev1.LastAppliedConfigAnnotation
-
-func setLastAppliedConfig(u *k8sunstructured.Unstructured, srcJSON string) {
-	annotations := u.GetAnnotations()
-	if len(annotations) == 0 {
-		annotations = make(map[string]string)
-	}
-	annotations[lastAppliedConfig] = srcJSON
-	u.SetAnnotations(annotations)
-}
-
-func getLastAppliedConfig(u *k8sunstructured.Unstructured) string {
-	return strings.TrimRight(u.GetAnnotations()[lastAppliedConfig], "\r\n")
-}
-
 func getOriginalModifiedCurrent(originalJSON string, modifiedJSON string, currentAllowNotFound bool, m interface{}) (original []byte, modified []byte, current []byte, err error) {
 	client := m.(*Config).Client
 	mapper := m.(*Config).Mapper
@@ -47,9 +30,6 @@ func getOriginalModifiedCurrent(originalJSON string, modifiedJSON string, curren
 	if err != nil {
 		return nil, nil, nil, err
 	}
-
-	setLastAppliedConfig(o, originalJSON)
-	setLastAppliedConfig(n, modifiedJSON)
 
 	mapping, err := mapper.RESTMapping(n.GroupVersionKind().GroupKind(), n.GroupVersionKind().Version)
 	if err != nil {

@@ -79,8 +79,6 @@ func kustomizationResourceCreate(d *schema.ResourceData, m interface{}) error {
 
 	namespace := u.GetNamespace()
 
-	setLastAppliedConfig(u, srcJSON)
-
 	if namespace != "" {
 		// wait for the namespace to exist
 		nsGvk := k8sschema.GroupVersionKind{
@@ -136,8 +134,6 @@ func kustomizationResourceCreate(d *schema.ResourceData, m interface{}) error {
 	id := string(resp.GetUID())
 	d.SetId(id)
 
-	d.Set("manifest", getLastAppliedConfig(resp))
-
 	return kustomizationResourceRead(d, m)
 }
 
@@ -173,7 +169,22 @@ func kustomizationResourceRead(d *schema.ResourceData, m interface{}) error {
 	id := string(resp.GetUID())
 	d.SetId(id)
 
-	d.Set("manifest", getLastAppliedConfig(resp))
+	respJSON, err := resp.MarshalJSON()
+	if err != nil {
+		return logErrorForResource(
+			u,
+			fmt.Errorf("JSON error: %s", err),
+		)
+	}
+
+	manifest, err := flattenApiResponse(u.GroupVersionKind(), respJSON, []byte(srcJSON))
+	if err != nil {
+		return logErrorForResource(
+			u,
+			fmt.Errorf("manifest flatten error: %s", err),
+		)
+	}
+	d.Set("manifest", manifest)
 
 	return nil
 }
@@ -382,8 +393,6 @@ func kustomizationResourceUpdate(d *schema.ResourceData, m interface{}) error {
 	id := string(patchResp.GetUID())
 	d.SetId(id)
 
-	d.Set("manifest", getLastAppliedConfig(patchResp))
-
 	return kustomizationResourceRead(d, m)
 }
 
@@ -494,14 +503,16 @@ func kustomizationResourceImport(d *schema.ResourceData, m interface{}) ([]*sche
 	id := string(resp.GetUID())
 	d.SetId(id)
 
-	lac := getLastAppliedConfig(resp)
-	if lac == "" {
-		return nil, logError(
-			fmt.Errorf("group: %q, kind: %q, namespace: %q, name: %q: can not import resources without %q annotation", gk.Group, gk.Kind, k.Namespace, k.Name, lastAppliedConfig),
-		)
+	respJSON, err := resp.MarshalJSON()
+	if err != nil {
+		return nil, logError(fmt.Errorf("JSON error: %s", err))
 	}
 
-	d.Set("manifest", lac)
+	manifest, err := flattenApiResponse(resp.GroupVersionKind(), respJSON, respJSON)
+	if err != nil {
+		return nil, logError(fmt.Errorf("manifest flatten error: %s", err))
+	}
+	d.Set("manifest", manifest)
 
 	return []*schema.ResourceData{d}, nil
 }
