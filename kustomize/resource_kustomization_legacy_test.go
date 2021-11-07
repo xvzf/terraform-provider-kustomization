@@ -59,7 +59,7 @@ func TestAccResourceKustomization_legacy_basic(t *testing.T) {
 				ResourceName:      "kustomization_resource.test[\"~G_v1_Namespace|~X|test-basic\"]",
 				ImportStateId:     "~G_v1_Namespace|~X|test-basic",
 				ImportState:       true,
-				ImportStateVerify: true,
+				ImportStateVerify: false,
 			},
 		},
 	})
@@ -105,7 +105,7 @@ func TestAccResourceKustomization_importLegacyInvalidID(t *testing.T) {
 				ResourceName:      "kustomization_resource.test[\"~G_v1_Namespace|~X|test-basic\"]",
 				ImportStateId:     "invalidID",
 				ImportState:       true,
-				ImportStateVerify: true,
+				ImportStateVerify: false,
 				ExpectError:       regexp.MustCompile("invalid ID: \"invalidID\", valid IDs look like: \"~G_v1_Namespace|~X|example\""),
 			},
 		},
@@ -167,7 +167,7 @@ func TestAccResourceKustomization_legacy_updateInplace(t *testing.T) {
 				ResourceName:      "kustomization_resource.test[\"~G_v1_Namespace|~X|test-update-inplace\"]",
 				ImportStateId:     "~G_v1_Namespace|~X|test-update-inplace",
 				ImportState:       true,
-				ImportStateVerify: true,
+				ImportStateVerify: false,
 			},
 		},
 	})
@@ -240,7 +240,7 @@ func TestAccResourceKustomization_legacy_updateRecreate(t *testing.T) {
 				ResourceName:      "kustomization_resource.test[\"~G_v1_Namespace|~X|test-update-recreate\"]",
 				ImportStateId:     "~G_v1_Namespace|~X|test-update-recreate",
 				ImportState:       true,
-				ImportStateVerify: true,
+				ImportStateVerify: false,
 			},
 		},
 	})
@@ -400,7 +400,7 @@ func TestAccResourceKustomization_legacy_webhook(t *testing.T) {
 				ResourceName:      "kustomization_resource.test[\"admissionregistration.k8s.io_v1_ValidatingWebhookConfiguration|~X|pod-policy.example.com\"]",
 				ImportStateId:     "admissionregistration.k8s.io_v1_ValidatingWebhookConfiguration|~X|pod-policy.example.com",
 				ImportState:       true,
-				ImportStateVerify: true,
+				ImportStateVerify: false,
 			},
 		},
 	})
